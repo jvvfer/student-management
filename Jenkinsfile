@@ -24,20 +24,19 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'mvn test -DskipTests'
+                sh 'mvn test'
             }
         }
         
         stage('Package') {
             steps {
                 echo 'Packaging the application...'
-                sh 'mvn package -DskipTests'
+                sh 'mvn package'
             }
         }
     }
     
-    post {
-        success {
+    post {        success {
             echo 'Build succeeded!'
         }
         failure {
