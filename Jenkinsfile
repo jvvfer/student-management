@@ -7,40 +7,34 @@ pipeline {
     }
     
     stages {
-        stage('Checkout') {
+        stage('Git Checkout') {
             steps {
-                echo 'Checking out code from Git...'
-                checkout scm
+                echo 'Cloning repository from GitHub...'
+                git branch: 'main', url: 'https://github.com/jvvfer/student-management.git'
             }
         }
         
         stage('Build') {
             steps {
-                echo 'Building the project...'
+                echo 'Compiling the project...'
                 sh 'mvn clean compile'
             }
         }
         
         stage('Test') {
             steps {
-                echo 'Running tests...'
+                echo 'Running unit tests...'
                 sh 'mvn test'
-            }
-        }
-        
-        stage('Package') {
-            steps {
-                echo 'Packaging the application...'
-                sh 'mvn package'
             }
         }
     }
     
-    post {        success {
-            echo 'Build succeeded!'
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Build failed!'
+            echo 'Pipeline failed!'
         }
     }
 }
