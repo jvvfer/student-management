@@ -5,7 +5,9 @@ pipeline {
         maven 'Maven-3.8.7'
         jdk 'JDK-17'
     }
-    
+    environment {
+        SONAR_HOST_URL = 'http://192.168.3.128:9000'
+    }    
     stages {
         stage('Git Checkout') {
             steps {
@@ -28,7 +30,14 @@ pipeline {
             }
         }
     }
-    
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Analyzing code quality with SonarQube...'
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
     post {
         success {
             echo 'Pipeline completed successfully!'
