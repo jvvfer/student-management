@@ -8,6 +8,8 @@ pipeline {
     
     environment {
         SONAR_HOST_URL = 'http://192.168.3.128:9000'
+        DOCKER_IMAGE = 'jvvfer/student-management'
+        DOCKER_TAG = '1.0'
     }
     
     stages {
@@ -53,12 +55,31 @@ pipeline {
                 sh 'mvn package -DskipTests'
             }
         }
+        
+        stage('Docker Build') {
+            steps {
+                echo 'Building Docker image...'
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+            }
+        }
+        
+        stage('Docker Push') {
+            steps {
+                echo 'Pushing Docker image to Docker Hub...'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
     }
     
     post {
         success {
             echo 'Pipeline completed successfully!'
-            echo 'Coverage report available at: target/site/jacoco/index.html'
+            echo "Docker image available at: ${DOCKER_IMAGE}:${DOCKER_TAG}"
         }
         failure {
             echo 'Pipeline failed!'
