@@ -25,10 +25,10 @@ pipeline {
             }
         }
         
-        stage('Test') {
+        stage('Test & Coverage') {
             steps {
-                echo 'Running unit tests...'
-                sh 'mvn test'
+                echo 'Running unit tests with coverage...'
+                sh 'mvn test jacoco:report'
             }
         }
         
@@ -36,7 +36,13 @@ pipeline {
             steps {
                 echo 'Analyzing code quality with SonarQube...'
                 withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
+                    sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=student-management \
+                        -Dsonar.projectName=student-management \
+                        -Dsonar.java.coveragePlugin=jacoco \
+                        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                    '''
                 }
             }
         }
@@ -52,6 +58,7 @@ pipeline {
     post {
         success {
             echo 'Pipeline completed successfully!'
+            echo 'Coverage report available at: target/site/jacoco/index.html'
         }
         failure {
             echo 'Pipeline failed!'
