@@ -9,6 +9,7 @@ data:
   DB_HOST: "mysql-service"
   DB_PORT: "3306"
   DB_NAME: "studentdb"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-service:3306/studentdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true"
 
 ---
 # Secret - Credentials sensibles (encodés en base64)
@@ -47,9 +48,9 @@ spec:
         env:
         - name: SPRING_DATASOURCE_URL
           valueFrom:
-     configMapKeyRef:
-      key: SPRING_DATASOURCE_URL
-      name: spring-config
+            configMapKeyRef:
+              name: spring-config
+              key: SPRING_DATASOURCE_URL
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -60,21 +61,6 @@ spec:
             secretKeyRef:
               name: spring-secret
               key: DB_PASSWORD
-        - name: DB_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: spring-config
-              key: DB_HOST
-        - name: DB_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: spring-config
-              key: DB_PORT
-        - name: DB_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: spring-config
-              key: DB_NAME
         - name: SPRING_JPA_HIBERNATE_DDL_AUTO
           value: "update"
 
