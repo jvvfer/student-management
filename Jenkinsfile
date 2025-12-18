@@ -74,6 +74,16 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo 'Deploying to Kubernetes cluster...'
+                sh '''
+                    kubectl apply -f k8s/mysql-deployment.yaml
+                    kubectl apply -f k8s/spring-deployment.yaml
+                    kubectl rollout status deployment/spring-app -n devops
+                '''
+            }
+        }
     }
     
     post {
